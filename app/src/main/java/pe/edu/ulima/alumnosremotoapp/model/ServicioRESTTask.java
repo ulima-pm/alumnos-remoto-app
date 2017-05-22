@@ -1,7 +1,9 @@
-package pe.edu.ulima.alumnosremotoapp;
+package pe.edu.ulima.alumnosremotoapp.model;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,10 +13,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import pe.edu.ulima.alumnosremotoapp.model.Alumno;
+
 public class ServicioRESTTask
-        extends AsyncTask<String, Void, Boolean>{
+        extends AsyncTask<String, Void, Alumno>{
+
+    private Alumno alumno;
+
     @Override
-    protected Boolean doInBackground(String... strings) {
+    protected Alumno doInBackground(String... strings) {
         try {
             URL url = new URL(strings[0]);
             HttpURLConnection conn =
@@ -30,6 +37,8 @@ public class ServicioRESTTask
                 InputStream is = conn.getInputStream();
                 String resp = convertInputStreamToString(is);
                 Log.i("TAG", resp);
+                Gson gson = new Gson();
+                return gson.fromJson(resp, Alumno.class);
             }else{
                 // Error en la peticion
                 Log.i("ERROR", "Hubo error: " + responseCode);
@@ -43,9 +52,19 @@ public class ServicioRESTTask
         return null;
     }
 
+    public Alumno getAlumno() {
+        return alumno;
+    }
+
+    public void setAlumno(Alumno alumno) {
+        this.alumno = alumno;
+    }
+
     @Override
-    protected void onPostExecute(Boolean aBoolean) {
-        super.onPostExecute(aBoolean);
+    protected void onPostExecute(Alumno alumno) {
+        super.onPostExecute(alumno);
+        Log.i("NOMBRE", alumno.getNombre());
+
     }
 
     private String convertInputStreamToString(InputStream is) throws IOException {
